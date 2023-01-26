@@ -1,0 +1,459 @@
+import discord
+from discord.ext import commands
+import requests
+
+config = {
+    'token': 'PLACE FOR TOKEN',
+    'prefix': '>'
+}
+info = []
+
+p = 0
+for g in range(50):
+    req = requests.get(f'https://www.cheapshark.com/api/1.0/deals?pageNumber={g+1}').text.replace('\\/', '/')
+    f = 0
+    for i in req[1:-1].replace('null', '"0"').replace('","', '`').replace('"},{"', '~~~~').replace('},{', '`').replace('~~~~', '"},,{"').replace(',,', '`').split('`'):
+        if '"release' not in i:
+            if i[:2] == '{"':
+                f = 1
+                info.append({})
+                kw = i.split('":"')
+                k = kw[0][2:]
+                w = kw[1]
+                info[p][k] = w
+            elif f == 1:
+                if i[-1] == '}' or i[-1] == '"':
+                    kw = i.split('":"')
+                else:
+                    kw = i.split('":')
+                k = kw[0]
+                if 'https://' not in kw[1]:
+                    w = kw[1][1:].replace('ess;for', 'ess,for')
+                else:
+                    w = kw[1].replace('ess;for', 'ess,for')
+                info[p][k] = w
+            if i[-2:] == '"}':
+                info[p][k] = info[p][k].replace('"}', '')
+                p += 1
+        else:
+            info[p]['dealRating'] = i[-3:]
+
+stores = [
+  {
+    "storeID": "1",
+    "storeName": "Steam",
+    "isActive": 1,
+    "images": {
+      "banner": "/img/stores/banners/0.png",
+      "logo": "/img/stores/logos/0.png",
+      "icon": "/img/stores/icons/0.png"
+    }
+  },
+  {
+    "storeID": "2",
+    "storeName": "GamersGate",
+    "isActive": 1,
+    "images": {
+      "banner": "/img/stores/banners/1.png",
+      "logo": "/img/stores/logos/1.png",
+      "icon": "/img/stores/icons/1.png"
+    }
+  },
+  {
+    "storeID": "3",
+    "storeName": "GreenManGaming",
+    "isActive": 1,
+    "images": {
+      "banner": "/img/stores/banners/2.png",
+      "logo": "/img/stores/logos/2.png",
+      "icon": "/img/stores/icons/2.png"
+    }
+  },
+  {
+    "storeID": "4",
+    "storeName": "Amazon",
+    "isActive": 1,
+    "images": {
+      "banner": "/img/stores/banners/3.png",
+      "logo": "/img/stores/logos/3.png",
+      "icon": "/img/stores/icons/3.png"
+    }
+  },
+  {
+    "storeID": "5",
+    "storeName": "GameStop",
+    "isActive": 1,
+    "images": {
+      "banner": "/img/stores/banners/4.png",
+      "logo": "/img/stores/logos/4.png",
+      "icon": "/img/stores/icons/4.png"
+    }
+  },
+  {
+    "storeID": "6",
+    "storeName": "Direct2Drive",
+    "isActive": 1,
+    "images": {
+      "banner": "/img/stores/banners/5.png",
+      "logo": "/img/stores/logos/5.png",
+      "icon": "/img/stores/icons/5.png"
+    }
+  },
+  {
+    "storeID": "7",
+    "storeName": "GoG",
+    "isActive": 1,
+    "images": {
+      "banner": "/img/stores/banners/6.png",
+      "logo": "/img/stores/logos/6.png",
+      "icon": "/img/stores/icons/6.png"
+    }
+  },
+  {
+    "storeID": "8",
+    "storeName": "Origin",
+    "isActive": 1,
+    "images": {
+      "banner": "/img/stores/banners/7.png",
+      "logo": "/img/stores/logos/7.png",
+      "icon": "/img/stores/icons/7.png"
+    }
+  },
+  {
+    "storeID": "9",
+    "storeName": "Get Games",
+    "isActive": 0,
+    "images": {
+      "banner": "/img/stores/banners/8.png",
+      "logo": "/img/stores/logos/8.png",
+      "icon": "/img/stores/icons/8.png"
+    }
+  },
+  {
+    "storeID": "10",
+    "storeName": "Shiny Loot",
+    "isActive": 0,
+    "images": {
+      "banner": "/img/stores/banners/9.png",
+      "logo": "/img/stores/logos/9.png",
+      "icon": "/img/stores/icons/9.png"
+    }
+  },
+  {
+    "storeID": "11",
+    "storeName": "Humble Store",
+    "isActive": 1,
+    "images": {
+      "banner": "/img/stores/banners/10.png",
+      "logo": "/img/stores/logos/10.png",
+      "icon": "/img/stores/icons/10.png"
+    }
+  },
+  {
+    "storeID": "12",
+    "storeName": "Desura",
+    "isActive": 0,
+    "images": {
+      "banner": "/img/stores/banners/11.png",
+      "logo": "/img/stores/logos/11.png",
+      "icon": "/img/stores/icons/11.png"
+    }
+  },
+  {
+    "storeID": "13",
+    "storeName": "Uplay",
+    "isActive": 1,
+    "images": {
+      "banner": "/img/stores/banners/12.png",
+      "logo": "/img/stores/logos/12.png",
+      "icon": "/img/stores/icons/12.png"
+    }
+  },
+  {
+    "storeID": "14",
+    "storeName": "IndieGameStand",
+    "isActive": 0,
+    "images": {
+      "banner": "/img/stores/banners/13.png",
+      "logo": "/img/stores/logos/13.png",
+      "icon": "/img/stores/icons/13.png"
+    }
+  },
+  {
+    "storeID": "15",
+    "storeName": "Fanatical",
+    "isActive": 1,
+    "images": {
+      "banner": "/img/stores/banners/14.png",
+      "logo": "/img/stores/logos/14.png",
+      "icon": "/img/stores/icons/14.png"
+    }
+  },
+  {
+    "storeID": "16",
+    "storeName": "Gamesrocket",
+    "isActive": 0,
+    "images": {
+      "banner": "/img/stores/banners/15.png",
+      "logo": "/img/stores/logos/15.png",
+      "icon": "/img/stores/icons/15.png"
+    }
+  },
+  {
+    "storeID": "17",
+    "storeName": "Games Republic",
+    "isActive": 0,
+    "images": {
+      "banner": "/img/stores/banners/16.png",
+      "logo": "/img/stores/logos/16.png",
+      "icon": "/img/stores/icons/16.png"
+    }
+  },
+  {
+    "storeID": "18",
+    "storeName": "SilaGames",
+    "isActive": 1,
+    "images": {
+      "banner": "/img/stores/banners/17.png",
+      "logo": "/img/stores/logos/17.png",
+      "icon": "/img/stores/icons/17.png"
+    }
+  },
+  {
+    "storeID": "19",
+    "storeName": "Playfield",
+    "isActive": 0,
+    "images": {
+      "banner": "/img/stores/banners/18.png",
+      "logo": "/img/stores/logos/18.png",
+      "icon": "/img/stores/icons/18.png"
+    }
+  },
+  {
+    "storeID": "20",
+    "storeName": "ImperialGames",
+    "isActive": 0,
+    "images": {
+      "banner": "/img/stores/banners/19.png",
+      "logo": "/img/stores/logos/19.png",
+      "icon": "/img/stores/icons/19.png"
+    }
+  },
+  {
+    "storeID": "21",
+    "storeName": "WinGameStore",
+    "isActive": 1,
+    "images": {
+      "banner": "/img/stores/banners/20.png",
+      "logo": "/img/stores/logos/20.png",
+      "icon": "/img/stores/icons/20.png"
+    }
+  },
+  {
+    "storeID": "22",
+    "storeName": "FunStockDigital",
+    "isActive": 0,
+    "images": {
+      "banner": "/img/stores/banners/21.png",
+      "logo": "/img/stores/logos/21.png",
+      "icon": "/img/stores/icons/21.png"
+    }
+  },
+  {
+    "storeID": "23",
+    "storeName": "GameBillet",
+    "isActive": 1,
+    "images": {
+      "banner": "/img/stores/banners/22.png",
+      "logo": "/img/stores/logos/22.png",
+      "icon": "/img/stores/icons/22.png"
+    }
+  },
+  {
+    "storeID": "24",
+    "storeName": "Voidu",
+    "isActive": 1,
+    "images": {
+      "banner": "/img/stores/banners/23.png",
+      "logo": "/img/stores/logos/23.png",
+      "icon": "/img/stores/icons/23.png"
+    }
+  }
+]
+
+
+intents = discord.Intents.all()
+intents.members = True
+bot = commands.Bot(command_prefix=config['prefix'], intents=intents)
+
+
+@bot.command('?')
+async def q(ctx):
+    await ctx.send('>? - help command\n'
+                   '>exist <name> - if I know this game\n'
+                   '>game <title> - game ID\n'
+                   '>store <name> - store ID\n'
+                   '>best <name/ID> - game with largest deal rating in store\n'
+                   '>title <str> - all titles that include string\n'
+                   '>normal <title> - to know normal price\n'
+                   '>price <title> - to know sale price\n'
+                   '>deal <title> - to know deal ID\n'
+                   '>sale <title> - to know difference between normal and sale prices\n'
+                   '>rating <title> - to know Steam rating\n'
+                   '>metacritic <title> - to know metacritic')
+
+@bot.command()
+async def store(ctx, *arg):
+    name = ' '.join(arg)
+    id = 0
+    for i in stores:
+        if i['storeName'] == name:
+            id = i['storeID']
+    if id != 0:
+        await ctx.send(f"Its ID is {id}.")
+    else:
+        await ctx.send("I don't know this store.")
+
+
+@bot.command()
+async def best(ctx, *arg):
+    id = ' '.join(arg)
+    name = ''
+    dr = 0
+    for i in info:
+        if i['storeID'] == id and float(i['dealRating']) > dr:
+            name = i['title']
+            dr = float(i['dealRating'])
+    if name != '':
+        await ctx.send(f"The best game in this store is {name}.")
+    else:
+        await ctx.send("I don't know this store ID.")
+
+
+@bot.command()
+async def exist(ctx, *arg):
+    name = ' '.join(arg)
+    id = 0
+    for i in info:
+        if i['title'] == name:
+            id = i['gameID']
+    if id != 0:
+        await ctx.send('I know this game.')
+    else:
+        await ctx.send("I don't know this game.")
+
+
+@bot.command()
+async def game(ctx, *arg):
+    name = ' '.join(arg)
+    id = 0
+    for i in info:
+        if i['title'] == name:
+            id = i['gameID']
+    if id != 0:
+        await ctx.send(f'Its ID is {id}.')
+    else:
+        await ctx.send("I don't know this game.")
+
+
+@bot.command()
+async def normal(ctx, *arg):
+    name = ' '.join(arg)
+    price = -1
+    for i in info:
+        if i['title'] == name:
+            price = i['normalPrice']
+    if price != -1:
+        await ctx.send(f'Its normal price is {price}.')
+    else:
+        await ctx.send("I don't know this game.")
+
+
+@bot.command()
+async def price(ctx, *arg):
+    name = ' '.join(arg)
+    price = -1
+    for i in info:
+        if i['title'] == name:
+            price = i['salePrice']
+    if price != -1:
+        await ctx.send(f'Its sale price is {price}.')
+    else:
+        await ctx.send("I don't know this game.")
+
+
+@bot.command()
+async def metacritic(ctx, *arg):
+    await ctx.send('This command is broken.')
+    '''
+    name = ' '.join(arg)
+    mc = -1
+    for i in info:
+        if i['title'] == name:
+            mc = i['metacritic']
+    if mc != -1:
+        await ctx.send(f'Its metacritic is {mc}.')
+    else:
+        await ctx.send("I don't know this game.")
+    '''
+
+
+@bot.command()
+async def rating(ctx, *arg):
+    name = ' '.join(arg)
+    rt = -1
+    for i in info:
+        if i['title'] == name:
+            rt = [i['steamRatingPercent'], i['steamRatingText']]
+    if rt != -1:
+        await ctx.send(f'Its Steam Rating is {rt[0]}% ({rt[1]}).')
+    else:
+        await ctx.send("I don't know this game.")
+
+
+@bot.command()
+async def title(ctx, *arg):
+    tl = ' '.join(arg)
+    names = set()
+    for i in info:
+        if tl in i['title']:
+            names.add(i['title'])
+    if names != []:
+        await ctx.send(f'It may be {str(names)[1:-1]}.')
+    else:
+        await ctx.send("I don't know games like that.")
+
+
+@bot.command()
+async def deal(ctx, *arg):
+    name = ' '.join(arg)
+    deal = 0
+    for i in info:
+        if i['title'] == name:
+            deal = i['dealID']
+    if deal != 0:
+        await ctx.send(f'Its deal ID is {deal}.')
+    else:
+        await ctx.send("I don't know this game.")
+
+
+@bot.command()
+async def sale(ctx, *arg):
+    name = ' '.join(arg)
+    sale = -1
+    for i in info:
+        if i['title'] == name or i['gameID'] == name:
+            sale = float(i['normalPrice']) - float(i['salePrice'])
+    if sale != -1:
+        await ctx.send(f"Its sale is {sale}")
+    else:
+        await ctx.send("I don't know this game.")
+
+
+@bot.command()
+async def sleep(ctx):
+    await ctx.send('OK.')
+    exit()
+
+
+bot.run(config['token'])
